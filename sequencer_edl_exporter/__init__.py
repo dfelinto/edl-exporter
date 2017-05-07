@@ -27,7 +27,7 @@ bl_info = {
     "warning": "",
     "wiki_url": "https://github.com/dfelinto/edl-exporter",
     "tracker_url": "",
-    "category": "video Sequencer"}
+    "category": "Video Sequencer"}
 
 
 import bpy

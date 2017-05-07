@@ -81,7 +81,7 @@ class ImageSequenceStrip(Strip):
 
         directories = strip.directory.split(os.path.sep)
         assert(len(directories) > 1 and directories[-2])
-        self._reel_name = directories[-2]
+        self._reel_name = directories[-2][:7]
 
 
 # ############################################################

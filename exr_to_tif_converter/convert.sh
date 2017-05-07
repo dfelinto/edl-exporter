@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Convert the .exr from the sequencer to .tif files"
 
-BLENDER=/home/guest/src/blender/versions/blender-2.78a/blender
+BLENDER=/shared/software/blender/blender-buildbot/latest/blender
 PYTHON_SCRIPT=/shared/software/edl-exporter/exr_to_tif_converter/exr_to_tif_converter.py
 EDIT_FILE=/render/agent327/export/tools/edit.blend
 CHANNEL=31

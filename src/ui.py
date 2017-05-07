@@ -9,7 +9,7 @@ from .operator import SEQUENCER_OT_EDLExport
 
 def menu_func_export(self, context):
     self.layout.operator(
-            SEQUENCER_OT_EDLExport.bl_idname, text="Export EDL Data")
+        SEQUENCER_OT_EDLExport.bl_idname, text="Video Sequence (.edl)")
 
 
 # ############################################################

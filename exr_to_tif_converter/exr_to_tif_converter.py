@@ -78,6 +78,15 @@ def get_directory_output(output_folder, strip):
     return os.path.join(output_folder, scene_name)
 
 
+def set_scene_defaults(scene):
+    """
+    Set scene defaults for the project.
+    """
+    scene.view_settings.look = 'None'
+    scene.render.image_settings.file_format = 'TIFF'
+    scene.render.image_settings.color_depth = '16'
+
+
 def main():
     context = bpy.context
     scene = context.scene
@@ -85,6 +94,8 @@ def main():
     if not scene.sequence_editor:
         print("Scene has no sequence editor")
         sys.exit(-1)
+
+    set_scene_defaults()
 
     arguments = get_arguments()
     channel, output_folder = get_arguments()

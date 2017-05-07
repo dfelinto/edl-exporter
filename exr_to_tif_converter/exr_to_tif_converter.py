@@ -95,7 +95,7 @@ def main():
         print("Scene has no sequence editor")
         sys.exit(-1)
 
-    set_scene_defaults()
+    set_scene_defaults(scene)
 
     arguments = get_arguments()
     channel, output_folder = get_arguments()

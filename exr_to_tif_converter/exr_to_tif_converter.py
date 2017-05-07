@@ -8,12 +8,19 @@ def create_directory(directory):
     Create output folders.
     """
     try:
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(directory, exist_ok=False)
+
+    except OSError:
+        # Folder already exists, skip it
+        return False
+
     except Exception as E:
         print(E)
         sys.exit(-1)
+
     else:
         print("Created directory: \"{0}\"".format(directory))
+        return True
 
 
 def convert_exr_to_tif(image_input, image_output):
@@ -38,7 +45,8 @@ def convert(dir_input, dir_output):
     """
     Convert all .exr files in dir_input to .tif files in dir_output
     """
-    create_directory(dir_output)
+    if not create_directory(dir_output):
+        return
 
     for filepath_input in os.listdir(dir_input):
 

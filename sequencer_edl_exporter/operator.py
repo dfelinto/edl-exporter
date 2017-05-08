@@ -150,9 +150,9 @@ class ImageStrip(ImageSequenceStrip):
         """
         line = super(ImageStrip, self).to_edl()
         line += "" \
-                "M2 " \
+                "M2  " \
                 "{reel_name:8s} " \
-                "000.0 " \
+                "000.0           " \
                 "{source_in}" \
                 "\n\n" \
                 .format(**self._data)

@@ -81,6 +81,7 @@ class ImageSequenceStrip(Strip):
 
         directories = strip.directory.split(os.path.sep)
         assert(len(directories) > 1 and directories[-2])
+        # Force a 6-chars name, like "06_01_A".
         self._reel_name = directories[-2][:7]
 
 

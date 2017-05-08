@@ -1,4 +1,5 @@
 import os
+import re
 import bpy
 
 from bpy_extras.io_utils import ExportHelper
@@ -65,27 +66,90 @@ class Strip(object):
         return bpy.utils.smpte_from_frame(
             frame, fps=self._fps, fps_base=self._fps_base)
 
+    def _get_reel_name(self, strip):
+        """
+        Get the reel name based on the directory.
+        Also forces a 7-chars name like "01_02_B".
+        """
+        directories = bpy.path.abspath(strip.directory).split(os.path.sep)
+        assert(len(directories) > 1 and directories[-2])
+        return directories[-2][:7]
 
-class ImageSequenceStrip(Strip):
-    _channel_type = 'V'
+    def _get_image_offset(self, *args):
+        return 0
 
     def _process_strip(self, strip):
         frame_start = strip.frame_start
         frame_offset_start = strip.frame_offset_start
         frame_final_duration = strip.frame_final_duration
 
-        self._source_in = frame_offset_start
+        self._source_in = self._get_image_offset(strip) + frame_offset_start
         self._source_out = self._source_in + frame_final_duration
         self._edit_in = frame_start + frame_offset_start
         self._edit_out = self._edit_in + frame_final_duration
 
-        directories = bpy.path.abspath(strip.directory).split(os.path.sep)
-        assert(len(directories) > 1 and directories[-2])
-        # Force a 6-chars name, like "06_01_A".
-        self._reel_name = directories[-2][:7]
+        self._reel_name = self._get_reel_name(strip)
+
+
+class VideoStrip(Strip):
+    _channel_type = 'V'
+
+
+class ImageSequenceStrip(VideoStrip):
+    def _get_image_offset(self, strip):
+        """
+        We should check if at least the first frame is in the
+        hard disk.
+        """
+        return 0
 
 
 class ImageStrip(ImageSequenceStrip):
+    def _get_image_offset(self, strip):
+        """
+        Get the real offset of the image based on the
+        image sequence the image is from.
+        """
+        filename = strip.elements[0].filename
+        digits = list(re.finditer('\d+', filename))
+
+        if len(digits) == 0:
+            return 0
+
+        directory = bpy.path.abspath(strip.directory)
+        digits = digits[-1]
+        number = int(digits.group())
+
+        prefix = filename[:digits.start()]
+        suffix = filename[digits.end():]
+
+        filepath_values = {
+            "directory": directory + os.path.sep,
+            "prefix": prefix,
+            "suffix": suffix,
+            "number_len": len(digits.group()),
+            "number": number,
+            }
+
+        real_offset = 0
+        while number > 1:
+            number -= 1
+            filepath_values["number"] = number
+            filepath = "" \
+                "{directory}" \
+                "{prefix}" \
+                "{number:0{number_len}}" \
+                "{suffix}" \
+                "".format(**filepath_values)
+
+            if os.path.isfile(filepath):
+                real_offset += 1
+            else:
+                break
+
+        expected_offset = strip.frame_offset_start
+        return real_offset - expected_offset
+
     def to_edl(self):
         """
         M2 is the command to suggest speed change.
@@ -103,13 +167,20 @@ class ImageStrip(ImageSequenceStrip):
 
 
 def refine_strip(index, strip, fps, fps_base):
+    """
+    Define which class to inherit based on the strip properties.
+    """
     strip_class = Strip
+    strip_type = strip.type
 
-    if strip.type == 'IMAGE':
+    if strip_type == 'IMAGE':
         if len(strip.elements) == 1:
             strip_class = ImageStrip
         else:
             strip_class = ImageSequenceStrip
+
+    elif strip_type == 'MOVIE':
+        strip_class = VideoStrip
 
     return strip_class(index, strip, fps, fps_base)
 
@@ -164,7 +235,7 @@ class SEQUENCER_OT_EDLExport(Operator, ExportHelper):
         channels = {}
         for strip in scene.sequence_editor.sequences:
 
-            if strip.type != 'IMAGE':
+            if strip.type not in {'IMAGE', 'MOVIE'}:
                 continue
 
             if not strip.channel in channels:

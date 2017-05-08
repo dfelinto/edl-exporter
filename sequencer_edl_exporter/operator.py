@@ -98,15 +98,6 @@ class VideoStrip(Strip):
 class ImageSequenceStrip(VideoStrip):
     def _get_image_offset(self, strip):
         """
-        We should check if at least the first frame is in the
-        hard disk.
-        """
-        return 0
-
-
-class ImageStrip(ImageSequenceStrip):
-    def _get_image_offset(self, strip):
-        """
         Get the real offset of the image based on the
         image sequence the image is from.
         """
@@ -150,6 +141,8 @@ class ImageStrip(ImageSequenceStrip):
         expected_offset = strip.frame_offset_start
         return real_offset - expected_offset
 
+
+class ImageStrip(ImageSequenceStrip):
     def to_edl(self):
         """
         M2 is the command to suggest speed change.

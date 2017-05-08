@@ -79,7 +79,7 @@ class ImageSequenceStrip(Strip):
         self._edit_in = frame_start + frame_offset_start
         self._edit_out = self._edit_in + frame_final_duration
 
-        directories = strip.directory.split(os.path.sep)
+        directories = bpy.path.abspath(strip.directory).split(os.path.sep)
         assert(len(directories) > 1 and directories[-2])
         # Force a 6-chars name, like "06_01_A".
         self._reel_name = directories[-2][:7]

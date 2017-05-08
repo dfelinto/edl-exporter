@@ -85,6 +85,35 @@ class ImageSequenceStrip(Strip):
         self._reel_name = directories[-2][:7]
 
 
+class ImageStrip(ImageSequenceStrip):
+    def to_edl(self):
+        """
+        M2 is the command to suggest speed change.
+        In this case we do it with 000.0, which freezes the frame.
+        """
+        line = super(ImageStrip, self).to_edl()
+        line += "" \
+                "M2 " \
+                "{reel_name:8s} " \
+                "000.0 " \
+                "{source_in}" \
+                "\n\n" \
+                .format(**self._data)
+        return line
+
+
+def refine_strip(index, strip, fps, fps_base):
+    strip_class = Strip
+
+    if strip.type == 'IMAGE':
+        if len(strip.elements) == 1:
+            strip_class = ImageStrip
+        else:
+            strip_class = ImageSequenceStrip
+
+    return strip_class(index, strip, fps, fps_base)
+
+
 # ############################################################
 # Main Exporting Routine
 # ############################################################
@@ -95,7 +124,7 @@ def export(filepath, fps, fps_base, strips):
     It's a bit tricky because we need to sort the strips in order
     and extract their reel number
     """
-    order_strips = [ImageSequenceStrip(i, s, fps, fps_base) for i, s in enumerate(
+    order_strips = [refine_strip(i, s, fps, fps_base) for i, s in enumerate(
         sorted(strips, key=lambda s: s.frame_start + s.frame_offset_start))]
 
     with open(filepath, 'w') as f:

@@ -228,7 +228,7 @@ class SEQUENCER_OT_EDLExport(Operator, ExportHelper):
         channels = {}
         for strip in scene.sequence_editor.sequences:
 
-            if strip.type not in {'IMAGE', 'MOVIE'}:
+            if strip.type not in {'IMAGE',}:
                 continue
 
             if not strip.channel in channels:

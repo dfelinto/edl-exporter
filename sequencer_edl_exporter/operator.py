@@ -189,7 +189,7 @@ def refine_strip(index, strip, fps, fps_base):
 # Main Exporting Routine
 # ############################################################
 
-def export(filepath, fps, fps_base, strips):
+def export(filepath, title, fps, fps_base, strips):
     """Create a new file"""
     """
     It's a bit tricky because we need to sort the strips in order
@@ -199,7 +199,7 @@ def export(filepath, fps, fps_base, strips):
         sorted(strips, key=lambda s: s.frame_start + s.frame_offset_start))]
 
     with open(filepath, 'w') as f:
-        f.write("TITLE: Agent 327\n")
+        f.write("TITLE: {0}\n".format(title))
 
         for strip in order_strips:
             f.write(strip.to_edl())
@@ -220,6 +220,10 @@ class SEQUENCER_OT_EDLExport(Operator, ExportHelper):
         default="*.edl",
         options={'HIDDEN'},
         maxlen=256,
+        )
+
+    title = StringProperty(
+        default="Cosmos Laundromat",
         )
 
     def execute(self, context):
@@ -245,7 +249,7 @@ class SEQUENCER_OT_EDLExport(Operator, ExportHelper):
 
         for v_index, strips in channels.items():
             filepath = self.get_filepath(v_index)
-            export(filepath, fps, fps_base, strips)
+            export(filepath, self.title, fps, fps_base, strips)
 
         return {'FINISHED'}
 

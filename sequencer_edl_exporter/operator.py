@@ -71,9 +71,7 @@ class Strip(object):
         Get the reel name based on the directory.
         Also forces a 7-chars name like "01_02_B".
         """
-        directories = bpy.path.abspath(strip.directory).split(os.path.sep)
-        assert(len(directories) > 1 and directories[-2])
-        return directories[-2][:7]
+        return strip.name
 
     def _get_image_offset(self, *args):
         return 0

@@ -94,6 +94,13 @@ class Strip(object):
 class VideoStrip(Strip):
     _channel_type = 'V'
 
+    def _get_image_offset(self, strip):
+        """
+        Videos only need the strip offset
+        there is no way there are missing frames.
+        """
+        return strip.frame_offset_start
+
 
 class ImageSequenceStrip(VideoStrip):
     def _get_image_offset(self, strip):
@@ -228,7 +235,7 @@ class SEQUENCER_OT_EDLExport(Operator, ExportHelper):
         channels = {}
         for strip in scene.sequence_editor.sequences:
 
-            if strip.type not in {'IMAGE',}:
+            if strip.type not in {'IMAGE', 'MOVIE'}:
                 continue
 
             if not strip.channel in channels:

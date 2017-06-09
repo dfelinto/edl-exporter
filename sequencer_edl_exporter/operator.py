@@ -74,8 +74,9 @@ class Strip(object):
         name = strip.name
 
         if len(name) > 3 and name[-4] == '.':
-            name = name[:-4] + '__' + name[-3:]
-
+            suffix = name[-3:]
+            if suffix.lower() in {'mov', 'tif', 'png', 'jpg'}:
+                name = name[:-4] + '__' + name[-3:]
         return name
 
     def _get_image_offset(self, *args):

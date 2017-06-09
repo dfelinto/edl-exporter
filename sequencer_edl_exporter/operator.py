@@ -69,9 +69,14 @@ class Strip(object):
     def _get_reel_name(self, strip):
         """
         Get the reel name based on the directory.
-        Also forces a 7-chars name like "01_02_B".
+        Make sure we have no .jpg, repace it with __jpg
         """
-        return strip.name
+        name = strip.name
+
+        if len(name) > 3 and name[-4] == '.':
+            name = name[:-4] + '__' + name[-3:]
+
+        return name
 
     def _get_image_offset(self, *args):
         return 0
